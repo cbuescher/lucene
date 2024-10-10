@@ -248,11 +248,21 @@ final class BooleanScorerSupplier extends ScorerSupplier {
           throws IOException {
         final LeafCollector noScoreCollector =
             new LeafCollector() {
-              Score fake = new Score();
 
               @Override
               public void setScorer(Scorable scorer) throws IOException {
-                collector.setScorer(fake);
+                collector.setScorer(
+                    new Scorable() {
+                      @Override
+                      public float score() throws IOException {
+                        return 0;
+                      }
+
+                      @Override
+                      public void setMinCompetitiveScore(float minScore) throws IOException {
+                        scorer.setMinCompetitiveScore(minScore);
+                      }
+                    });
               }
 
               @Override
